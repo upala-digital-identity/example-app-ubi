@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Contract } from "@ethersproject/contracts";
+import { ethers } from "ethers";
+
 import { Web3Provider, getDefaultProvider } from "@ethersproject/providers";
 import { useQuery } from "@apollo/react-hooks";
 
@@ -21,6 +23,17 @@ async function readOnChainData() {
   console.log({ tokenBalance: tokenBalance.toString() });
 }
 
+async function balance(ubiApp) {
+  const balance = ethers.utils.formatEther(await ubiApp.myUBIBalance());
+  console.log("ok", balance);
+}
+
+async function claim(ubiApp) {
+  // Hardcoded path - [6,1]
+  const balance = await ubiApp.claimUBI([6,1]);
+  console.log("ok", balance);
+}
+
 function WalletButton({ provider, loadWeb3Modal }) {
   return (
     <Button
@@ -40,11 +53,20 @@ function WalletButton({ provider, loadWeb3Modal }) {
 function App() {
   const { loading, error, data } = useQuery(GET_TRANSFERS);
   const [provider, setProvider] = useState();
+  const [ubiApp, setUbiApp] = useState();
 
   /* Open wallet selection modal. */
   const loadWeb3Modal = useCallback(async () => {
     const newProvider = await web3Modal.connect();
-    setProvider(new Web3Provider(newProvider));
+    const userAddress = newProvider.selectedAddress;
+    const newWeb3Provider = new Web3Provider(newProvider)
+    setProvider(newWeb3Provider);
+    const userSigner = newWeb3Provider.getSigner();
+    setUbiApp(new Contract(
+      require("./contracts/UBIExampleDApp.address.js"), 
+      require("./contracts/UBIExampleDApp.abi.js"), 
+      userSigner
+    ))
   }, []);
 
   /* If user has loaded a wallet before, load it automatically. */
@@ -71,8 +93,12 @@ function App() {
           This DApp is using Upala human uniqueness score. <br />
         </p>
         
-        <Button onClick={() => readOnChainData()}>
-          Claim UBI
+        <Button onClick={() => claim(ubiApp)}>
+          Address
+        </Button>
+
+        <Button onClick={() => balance(ubiApp)}>
+          Balance
         </Button>
 
         <Link
