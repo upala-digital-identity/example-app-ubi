@@ -25,13 +25,17 @@ async function readOnChainData() {
 
 async function balance(ubiApp) {
   const balance = ethers.utils.formatEther(await ubiApp.myUBIBalance());
-  console.log("ok", balance);
+  console.log("Ubi balance: ", balance);
 }
 
-async function claim(ubiApp) {
-  // Hardcoded path - [6,1]
-  const balance = await ubiApp.claimUBI([6,1]);
-  console.log("ok", balance);
+async function claim(ubiApp, upala) {
+  const upalaUserId = (await upala.myId()).toNumber();
+  console.log("upalaUserId", upalaUserId);
+
+  // TODO WARNING!!! Hardcoded path - [user, metacartel, bladerunner]
+  // Only one path possible 
+  const claimUBI = await ubiApp.claimUBI([upalaUserId, 1, 4]);
+  console.log("claimUBI: ", claimUBI);
 }
 
 function WalletButton({ provider, loadWeb3Modal }) {
@@ -54,6 +58,7 @@ function App() {
   const { loading, error, data } = useQuery(GET_TRANSFERS);
   const [provider, setProvider] = useState();
   const [ubiApp, setUbiApp] = useState();
+  const [upala, setUpala] = useState();
 
   /* Open wallet selection modal. */
   const loadWeb3Modal = useCallback(async () => {
@@ -62,9 +67,19 @@ function App() {
     const newWeb3Provider = new Web3Provider(newProvider)
     setProvider(newWeb3Provider);
     const userSigner = newWeb3Provider.getSigner();
+    let network = (await newWeb3Provider.getNetwork()).name;
+    if (network == "unknown") { 
+      network = "localhost"; 
+    };
+    console.log("network", network); 
     setUbiApp(new Contract(
-      require("./contracts/UBIExampleDApp.address.js"), 
-      require("./contracts/UBIExampleDApp.abi.js"), 
+      require("./contracts/" + network + "/UBIExampleDApp.address.js"), 
+      require("./contracts/" + network + "/UBIExampleDApp.abi.js"), 
+      userSigner
+    ))
+    setUpala(new Contract(
+      require("./contracts/" + network + "/Upala.address.js"), 
+      require("./contracts/" + network + "/Upala.abi.js"), 
       userSigner
     ))
   }, []);
@@ -93,8 +108,8 @@ function App() {
           This DApp is using Upala human uniqueness score. <br />
         </p>
         
-        <Button onClick={() => claim(ubiApp)}>
-          Address
+        <Button onClick={() => claim(ubiApp, upala)}>
+          Claim
         </Button>
 
         <Button onClick={() => balance(ubiApp)}>
