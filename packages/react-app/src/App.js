@@ -67,11 +67,29 @@ function App() {
     const newWeb3Provider = new Web3Provider(newProvider)
     setProvider(newWeb3Provider);
     const userSigner = newWeb3Provider.getSigner();
-    let network = (await newWeb3Provider.getNetwork()).name;
-    if (network == "unknown") { 
-      network = "localhost"; 
-    };
-    console.log("network", network); 
+    let chain_id = (await newWeb3Provider.getNetwork()).chainId;
+
+    let network;
+    switch (chain_id) {
+      case 1:
+        console.log('This is mainnet')
+        break
+      case 3:
+        console.log('ropsten test network.')
+        break
+      case 4:
+        console.log('rinkeby test network.')
+        network = "rinkeby"
+        break
+      case 80001:
+        console.log('matic network.')
+        network = "matic"
+        break
+      default:
+        console.log("chain_id:", chain_id);
+        network = "localhost";
+    }
+    console.log("chain_id:", chain_id);
     setUbiApp(new Contract(
       require("./contracts/" + network + "/UBIExampleDApp.address.js"), 
       require("./contracts/" + network + "/UBIExampleDApp.abi.js"), 
