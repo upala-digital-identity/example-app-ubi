@@ -1,4 +1,11 @@
-export { default as abis } from "./abis";
-export { default as addresses } from "./addresses";
+import addressesRinkeby from "./addresses-rinkeby.js";
+import addressesMain from "./addresses-main.js";
 
-export * from "./addresses";
+const addresses = {
+    1: addressesMain,
+    4: addressesRinkeby,
+}
+
+export { default as abis } from "./abis";
+export { addresses };
+// export * from "./addresses";
