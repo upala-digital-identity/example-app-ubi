@@ -1,13 +1,15 @@
-import erc20Abi from "./abis/erc20.json";
-import ownableAbi from "./abis/ownable.json";
 import Upala from "./abis/Upala.json";
+import FakeDai from "./abis/FakeDai.json";
+import BasicPoolFactory from "./abis/BasicPoolFactory.json";
+import ProtoGroup from "./abis/ProtoGroup.json";
+import BladerunnerDAO from "./abis/BladerunnerDAO.json";
 import UBIExampleDApp from "./abis/UBIExampleDApp.json";
-
 const abis = {
-  erc20: erc20Abi,
-  ownable: ownableAbi,
   Upala: Upala,
-  UBIExampleDApp,
-};
-
+  FakeDai: FakeDai,
+  BasicPoolFactory: BasicPoolFactory,
+  ProtoGroup: ProtoGroup,
+  BladerunnerDAO: BladerunnerDAO,
+  UBIExampleDApp: UBIExampleDApp,
+}; 
 export default abis;
